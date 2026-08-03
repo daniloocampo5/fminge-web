@@ -28,7 +28,7 @@
 }
 
 *{box-sizing:border-box;}
-html{scroll-behavior:smooth;overflow-x:hidden;}
+html{scroll-behavior:smooth;}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
 body{
   margin:0;
@@ -38,6 +38,7 @@ body{
   font-size:16px;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
 }
 body::before{
   content:"";
@@ -787,9 +788,12 @@ var sections = Array.prototype.slice.call(document.querySelectorAll('main sectio
 var navA = Array.prototype.slice.call(navlinks.querySelectorAll('a'));
 
 function onScroll(){
-  var h = document.documentElement;
-  var scrollTop = h.scrollTop || document.body.scrollTop;
-  var max = (h.scrollHeight - h.clientHeight) || 1;
+  var scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+  var docHeight = Math.max(
+    document.body.scrollHeight, document.documentElement.scrollHeight,
+    document.body.offsetHeight, document.documentElement.offsetHeight
+  );
+  var max = (docHeight - window.innerHeight) || 1;
   var progress = Math.min(1, Math.max(0, scrollTop / max));
   plotbar.style.width = (progress * 100) + '%';
 
@@ -804,7 +808,8 @@ function onScroll(){
     a.classList.toggle('active', a.getAttribute('href') === '#' + current);
   });
 }
-document.addEventListener('scroll', function(){ window.requestAnimationFrame(onScroll); }, { passive: true });
+window.addEventListener('scroll', function(){ window.requestAnimationFrame(onScroll); }, { passive: true });
+window.addEventListener('resize', function(){ window.requestAnimationFrame(onScroll); });
 onScroll();
 
 /* scroll reveal */
